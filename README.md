@@ -36,9 +36,8 @@ max:LinearRegression Max$ python createImages.py
 The Code was solely implemented and tested on a MacBook Pro i5 / 8GB RAM.
 
 # Dependencies of the Code
-C++: iostream, iomanip, fstream, sstream
-
-Python: Numpy, Matplotlib
+- C++: iostream, iomanip, fstream, sstream
+- Python: Numpy, Matplotlib
 
 # Compiler
 The g++ compiler with the c++11 standard is used.
