@@ -15,10 +15,25 @@ In this repository we implement the analytical correct solution of OLS in C++ fo
 - generateData.py: Code for generating the datamatrix X and target y
 - X.txt: Datamatrix X (here with one feature, i.e. 1d case)
 - y.txt: Targetvector y
-- makefile.make: Makefile to compile (g++ is used) to code.
+- makefile.make: Makefile to compile (g++ is used) the code.
 - main.cpp: C++ code for computing the parameters for the best fitting line
 - output.txt Automatically generated txt file that contains the parameters for the best fitting line
 - createImages.py: Takes the output.txt file as well as X.txt and y.txt and saves the point distribution as well as the best fitting line into one image (right now this works only for the 1d case and if the intercept is fitted)
+
+# Exemplary execution in the terminal
+
+```
+max:LinearRegression Max$ g++ main.cpp -o main
+max:LinearRegression Max$ python generateData.py 
+max:LinearRegression Max$ ./main 
+Number of rows: 
+100
+Number of columns: 
+1
+Fit intercept?
+1
+max:LinearRegression Max$ python createImages.py
+```
 
 # Machine
 The Code was solely implemented and tested on a MacBook Pro i5 / 8GB RAM.
