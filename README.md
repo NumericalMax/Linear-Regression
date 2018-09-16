@@ -12,7 +12,7 @@ In this repository we implement the analytical correct solution of OLS in C++ fo
 
 # Structure of the Repository
 - images: Contains png-files drawing the outcome of the algorithm
-- generateData.py: Code for generating the datamatrix X and target y
+- generateData.py: Code for generating the datamatrix X and target y (here you can customize the distribution of data points)
 - X.txt: Datamatrix X (here with one feature, i.e. 1d case)
 - y.txt: Targetvector y
 - main.cpp: C++ code for computing the parameters for the best fitting line
