@@ -1,6 +1,6 @@
 # LinearRegression
 
-Linear regression is a frequent used method in the field of machine learning, specifically for tasks that require a continous output. Hence, for a given datamatrix X (rows represent samples / columns represent features) we try to find a line that fits the data reasonable well. Consider the following point distribution:
+Linear regression is a frequent used method in the field of machine learning, specifically for tasks that require a continous output. Hence, for a given datamatrix X (rows represent samples / columns represent features) we try to find a line that fits the given data reasonable well. Consider the following point distribution:
 
 ![alt text](https://github.com/NumericalMax/LinearRegression/blob/master/images/rawData.png)
 
