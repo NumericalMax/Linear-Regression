@@ -26,12 +26,9 @@ In this repository we implement the analytical correct solution of OLS in C++ fo
 max:LinearRegression Max$ g++ main.cpp -o main
 max:LinearRegression Max$ python generateData.py 
 max:LinearRegression Max$ ./main 
-Number of rows: 
-100
-Number of columns: 
-1
-Fit intercept?
-1
+Number of rows: 100
+Number of columns: 1
+Fit intercept? 1
 max:LinearRegression Max$ python createImages.py
 ```
 
