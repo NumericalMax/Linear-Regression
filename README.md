@@ -8,6 +8,9 @@ We aim to find a hyperplane (in a 1d context: line) that minimizes the distance 
 
 ![alt text](https://github.com/NumericalMax/LinearRegression/blob/master/images/regressionLine.png)
 
+A further example:
+![alt text](https://github.com/NumericalMax/LinearRegression/blob/master/images/regressionLine1.png)
+
 In this repository, we implement the analytical correct solution of OLS in C++ for a given data matrix. Note that for large scaled data matrices a numerical solution (e.g. gradient descent or Newton method) might be more reasonable. Also in the case that your matrix is sparse there are more advanced and more suitable solution to do the computation.
 
 # Structure of the Repository
