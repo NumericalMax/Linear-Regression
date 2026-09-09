@@ -25,6 +25,7 @@
 #include <iomanip>
 #include <sstream>
 #include <fstream>
+#include <cmath>
 
 namespace matrixOperation{
     
@@ -93,7 +94,7 @@ namespace matrixOperation{
     }
     
     
-    void invertMatrix(float **matrix, float **inv, int l){
+    bool invertMatrix(float **matrix, float **inv, int l){
         
         /*
          Description:   - Inverts matrix with gaussian elimination method (Remark: Actually we have to check whether the invert exists at least)
@@ -106,7 +107,7 @@ namespace matrixOperation{
         float t;
         float **a = new float*[l];
         for(int i = 0; i < l; ++i){
-            a[i] = new float[l];
+            a[i] = new float[2 * l];
         }
         for(i=0;i<l;i++){
             for(j=0;j<l;j++){
@@ -125,6 +126,26 @@ namespace matrixOperation{
             }
         }
         for(i=0; i<l; i++){
+            int pivot = i;
+            for(j = i + 1; j < l; j++){
+                if(std::fabs(a[j][i]) > std::fabs(a[pivot][i])){
+                    pivot = j;
+                }
+            }
+            if(std::fabs(a[pivot][i]) < 1e-7f){
+                for(int row = 0; row < l; ++row){
+                    delete[] a[row];
+                }
+                delete[] a;
+                return false;
+            }
+            if(pivot != i){
+                for(k = 0; k < 2 * l; k++){
+                    float tmp = a[i][k];
+                    a[i][k] = a[pivot][k];
+                    a[pivot][k] = tmp;
+                }
+            }
             t=a[i][i];
             // normalize row according to leading entry
             for(j=i; j<2*l; j++){
@@ -145,12 +166,17 @@ namespace matrixOperation{
                 inv[i][j - l] = a[i][j];
             }
         }
+        for(i = 0; i < l; ++i){
+            delete[] a[i];
+        }
+        delete[] a;
+        return true;
     }
 }
 
 namespace ioOperation {
     
-    void loadData(std::string pathX, float **X, std::string pathy, float *y, int l, int m, bool intercept){
+    bool loadData(std::string pathX, float **X, std::string pathy, float *y, int l, int m, bool intercept){
         
         /*
          Description:   - Loads the data matrix X and target vector y
@@ -166,14 +192,15 @@ namespace ioOperation {
         
         std::ifstream data(pathX);
         std::ifstream target(pathy);
+        int featureCount = intercept ? m - 1 : m;
         
         if (!data) {
             std::cout << "Cannot open data matrix.";
-            return;
+            return false;
         }
         if (!target) {
-            std::cout << "Cannot open data matrix.";
-            return;
+            std::cout << "Cannot open target vector.";
+            return false;
         }
         
         for(int row = 0; row < l; ++row){
@@ -182,15 +209,31 @@ namespace ioOperation {
             std::string line_target;
             std::getline(data, line_data);
             std::getline(target, line_target);
+            if(line_data.empty() || line_target.empty()){
+                std::cout << "Input files contain fewer rows than expected.";
+                return false;
+            }
+            for(char &c : line_data){
+                if(c == ','){
+                    c = ' ';
+                }
+            }
+            std::stringstream featureStream(line_data);
+            for(int col = 0; col < featureCount; ++col){
+                if(!(featureStream >> X[row][col])){
+                    std::cout << "Data matrix row has fewer columns than expected.";
+                    return false;
+                }
+            }
             
             y[row] = std::stof(line_target);
-            X[row][0] = std::stof(line_data);
             if(intercept){
-                X[row][1] = 1.0;
+                X[row][featureCount] = 1.0;
             }
         }
         data.close();
         target.close();
+        return true;
     }
     
     void writeData(std::string path, float *theta, int m){
@@ -229,34 +272,67 @@ int main(){
     }
     
     float **X = new float*[l];
-    float **partX = new float*[l];
-    float **partXX = new float*[l];
+    float **partX = new float*[m];
+    float **partXX = new float*[m];
     float **partXXX = new float*[m];
     float *y = new float[l];
     float *result = new float[m];
     
     for(int i = 0; i < l; ++i){
         X[i] = new float[m];
-        partX[i] = new float[l];
-        partXX[i] = new float[l];
     }
     for(int i = 0; i < m; ++i){
+        partX[i] = new float[m];
+        partXX[i] = new float[m];
         partXXX[i] = new float[l];
     }
     
-    ioOperation::loadData("X.txt", X, "y.txt", y, l, m, intercept);
+    if(!ioOperation::loadData("X.txt", X, "y.txt", y, l, m, intercept)){
+        for(int i = 0; i < l; ++i){
+            delete[] X[i];
+        }
+        for(int i = 0; i < m; ++i){
+            delete[] partX[i];
+            delete[] partXX[i];
+            delete[] partXXX[i];
+        }
+        delete[] X;
+        delete[] partX;
+        delete[] partXX;
+        delete[] partXXX;
+        delete[] y;
+        delete[] result;
+        return 1;
+    }
     matrixOperation::matrixProductWithTranspose(X, partX, l, m);
-    matrixOperation::invertMatrix(partX, partXX, m);
+    if(!matrixOperation::invertMatrix(partX, partXX, m)){
+        std::cout << "Normal equation matrix is singular and cannot be inverted.";
+        for(int i = 0; i < l; ++i){
+            delete[] X[i];
+        }
+        for(int i = 0; i < m; ++i){
+            delete[] partX[i];
+            delete[] partXX[i];
+            delete[] partXXX[i];
+        }
+        delete[] X;
+        delete[] partX;
+        delete[] partXX;
+        delete[] partXXX;
+        delete[] y;
+        delete[] result;
+        return 1;
+    }
     matrixOperation::matrixProductTranspose(partXX, X, partXXX, l, m);
     matrixOperation::matrixVectorMultiplication(partXXX, y, result, m, l);
     ioOperation::writeData("output.txt", result, m);
     
     for( int i = 0 ; i < l ; i++ ){
         delete[] X[i];
-        delete[] partX[i];
-        delete[] partXX[i];
     }
     for( int j = 0 ; j < m ; j++ ){
+        delete[] partX[j];
+        delete[] partXX[j];
         delete[] partXXX[j];
     }
 
